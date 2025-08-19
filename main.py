@@ -1,5 +1,6 @@
 import streamlit as st
 import sqlite3
+import pandas as pd
 
 # BANCO DE DADOS ----------------------------------------------------------------------------------------------------
 con = sqlite3.connect("contatos.db")
@@ -45,9 +46,10 @@ if menu == "Adicionar":
 # LISTA ---------------------------------------------------------------------------------------------------------------
 elif menu == "Lista":
     st.header("📱 Lista de Contatos")
-    for id, nome, tel, email in banco.execute("SELECT * FROM contatos"):
-        st.write(f"ID: {id} | Nome: {nome} | Telefone: {tel} | Email: {email}")
-
+    dados = banco.execute("SELECT * FROM contatos").fetchall()
+    df = pd.DataFrame(dados, columns=["ID", "Nome", "Telefone", "Email"])
+    st.table(df)
+    
 # ATUALIZAR ----------------------------------------------------------------------------------------------------------------
 elif menu == "Atualizar":
     st.header("📱 Atualizar Contato")
