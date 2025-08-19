@@ -1,6 +1,7 @@
 import streamlit as st
 import sqlite3
 import pandas as pd
+import re
 
 # BANCO DE DADOS ----------------------------------------------------------------------------------------------------
 con = sqlite3.connect("contatos.db")
@@ -28,20 +29,31 @@ if menu == "Descrição":
     st.text("O Lista de Contatos é um aplicativo desenvolvido em Python com Streamlit e SQLite que tem como objetivo facilitar a organização de informações de pessoas de forma prática e intuitiva. Com ele, é possível: Adicionar contatos informando nome, telefone e e-mail, Listar contatos cadastrados, visualizando todos em ordem, Atualizar contatos existentes, alterando seus dados sem perder o histórico, Excluir contatos que não são mais necessários.")
 
 # ADICINONAR ------------------------------------------------------------------------------------------------------------
+Padrao_telefone = r"^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$"
+
+padrao_email = r"^\S+@\S+\.\S+$"
+
 if menu == "Adicionar":
     st.header("📱 Adicionar Contato")
     st.subheader("Adicione os Dados seguintes para listar")
     nome = st.text_input("Nome")
-    telefone = st.text_input("Telefone")
+    telefone = st.text_input("Telefone ex: xx xxxx-xxxx")
     email = st.text_input("Email")
 
-    if st.button("Salvar") and nome and telefone and email:
-        banco.execute("INSERT INTO contatos (nome, telefone, email) VALUES (?, ?, ?)",
+    if st.button("Salvar"): 
+        if not nome or not telefone or not email:
+            st.warning("Preencha todos os dados")
+        elif not re.match(Padrao_telefone,telefone):
+            st.warning('Preencha o telefone de acordo com o padrão: xx xxxx-xxxx')
+        elif not re.match(padrao_email, email):
+            st.warning('Preencha o telefone de acordo com o padrão: usuario@dominio.com')
+        else:
+            banco.execute("INSERT INTO contatos (nome, telefone, email) VALUES (?, ?, ?)",
                     (nome, telefone, email))
-        con.commit()
-        st.success("Contato adicionado!")
-    else:
-        st.warning("Preencha Todas os dados")
+            con.commit()
+            st.success("Contato adicionado!")
+    
+
 
 # LISTA ---------------------------------------------------------------------------------------------------------------
 elif menu == "Lista":
@@ -49,7 +61,7 @@ elif menu == "Lista":
     dados = banco.execute("SELECT * FROM contatos").fetchall()
     df = pd.DataFrame(dados, columns=["ID", "Nome", "Telefone", "Email"])
     st.table(df)
-    
+
 # ATUALIZAR ----------------------------------------------------------------------------------------------------------------
 elif menu == "Atualizar":
     st.header("📱 Atualizar Contato")
