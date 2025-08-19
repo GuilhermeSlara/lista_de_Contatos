@@ -44,7 +44,7 @@ if menu == "Adicionar":
         if not nome or not telefone or not email:
             st.warning("Preencha todos os dados")
         elif not re.match(Padrao_telefone,telefone):
-            st.warning('Preencha o telefone de acordo com o padrão: xx xxxx-xxxx')
+            st.warning('Preencha o telefone de acordo com o padrão: xx xxxxx-xxxx')
         elif not re.match(padrao_email, email):
             st.warning('Preencha o telefone de acordo com o padrão: usuario@dominio.com')
         else:
